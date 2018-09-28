@@ -6,7 +6,7 @@ from glob import glob
 
 interpolation = cv2.INTER_CUBIC
 borderMode = cv2.BORDER_REPLICATE # Notes: 边界处理的时候， 把其镜像复制
-
+SEP = os.sep()
 def crop_face(img, bbox, crop_sz, bbox_ext, extra_pad=0):
     shape = img.shape # [height, width, channels]
     x, y, w, h = bbox
@@ -36,13 +36,13 @@ def crop_face(img, bbox, crop_sz, bbox_ext, extra_pad=0):
 
 
 def process_db_casia(db_dir, save_dir, scale, crop_sz):
-    for video_dir in glob('%s/*/*/*' % db_dir):
+    for video_dir in glob('{}{}*{}*{}*'.format(db_dir,SEP,SEP,SEP)):
         print("processing(scale %f): %s" % (scale, video_dir))
-        cur_save_dir = save_dir + '/' + video_dir[len(db_dir)+1:]
+        cur_save_dir = save_dir + SEP + video_dir[len(db_dir)+1:]
         if not os.path.exists(cur_save_dir):
             os.makedirs(cur_save_dir)
         for frame_name in glob('%s/frames/*.jpg' % video_dir):
-            frame_idx = frame_name.split('/')[-1].split('.')[0]
+            frame_idx = frame_name.split(SEP)[-1].split('.')[0]
             with open('%s/bboxes/%s.txt' % (video_dir, frame_idx), 'r') as bbox_f:
                 bbox = map(int, bbox_f.readline().split())
             if not bbox:

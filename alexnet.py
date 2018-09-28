@@ -10,7 +10,7 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 from tensorflow.contrib.slim.nets import alexnet
 import numpy as np
-
+import utils.my_utils as utils
 import utils.CNN as CNN
 
 def print_vars(sess):
@@ -45,14 +45,13 @@ class AlexNet():
         self.x_input = tf.placeholder(dtype=tf.float32, shape=self.x_shape)
         self.y_gt = tf.placeholder(dtype=tf.int8, shape=[None,2], name='y_ground_truth')
         self.num_class = num_class
-        self.init = False
-        
-        self.op = self.alex_net(True)
-
+        self.init = False    
+        self.model = self.alex_net(True)
         self.__learning_rate = 0.001
         #self.__self
         self.__batch_size = 25
         # build Alex-net
+        self.__log_path = 'log'
 
     def set_hyper_parameters(self,batch_size, learning_rate):
          self.__learning_rate = learning_rate
@@ -131,14 +130,26 @@ class AlexNet():
 
             return {"softmax_op": softmax, "loss_op": loss, "train_op": train_op}
     def train(self,x_train, y_train, sess ):
-        train_op = self.op["train_op"] 
-        loss_op = self.op["loss_op"]
-        softmax_op = self.op["softmax_op"]
+        
+        train_op = self.model["train_op"] 
+        loss_op = self.model["loss_op"]
+        softmax_op = self.model["softmax_op"]
         softmax, loss, _ = sess.run([softmax_op, loss_op, train_op], feed_dict={self.x_input:x_train,self.y_gt:y_train})
         return softmax, loss
 
     def test(self, x_test, y_test, sess):
-        pass
+        """ Test/evaluate the model
+            Make sure that the valuables is not initialized by the initilizer
+        """
+        softmax = self.model["softmax"]
+        pred_label = tf.argmax(softmax, axis=1)
+        pred_result = sess.run(pred_label,feed_dict={self.x_input:x_test,self.y_gt:y_test})
+
+        acc, num_correct = utils.calc_acc(y_test,pred_result )
+        print("Testing samples: {}. Correct Samples: {}. \
+                 Accuracy rate: {}".format(y_test.shape[0],num_correct,acc))
+
+
     def predict(self, x_2pred,sess):
         sess
     def restore(self, ckpt_filepath, sess):
@@ -155,8 +166,21 @@ class AlexNet():
         else:
             print("Initilize all variables by loading checkpoint file")
             return True
+    def save(self, save_path,sess):
+        saver = tf.train.Saver()
+        #if os.path.exists(logs):
+        #    os.makedirs('save_path') # todo : code more robustly
+        try:
+            saver.save(sess, save_path) 
+        except:
+            print("Failed save model to path: {}".format(save_path))
+            return False
+        print("Sucessfully save model to path: {}".format(save_path))
+        return True
+    
+    
     def extract_features(self,x_4_features, sess):
-        op = self.op["softmax"]
+        op = self.model["softmax"]
 
 
     

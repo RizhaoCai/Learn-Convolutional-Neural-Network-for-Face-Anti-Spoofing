@@ -2,6 +2,13 @@
 import h5py as h5
 
 def load_data(filepath,set_type,stride=1):
+    """
+        @filepath: the path of the dataset
+
+        @set_type: TRAIN for loading training set and TEST for loading testing set
+        
+        @stride: the stride of the loading slice data
+    """
     mat = h5.File(filepath, 'r')
     if set_type=='TRAIN':
         X = mat['TRAIN_X'][::stride]
