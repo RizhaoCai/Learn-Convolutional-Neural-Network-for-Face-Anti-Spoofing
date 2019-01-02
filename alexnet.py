@@ -151,7 +151,8 @@ class AlexNet():
 
 
     def predict(self, x_2pred,sess):
-        sess
+        # TODO: Implement the code of prediction
+        pass
     def restore(self, ckpt_filepath, sess):
         if ckpt_filepath == None:
             print("Initilize all variables with tf.initializer")
@@ -178,9 +179,6 @@ class AlexNet():
         print("Sucessfully save model to path: {}".format(save_path))
         return True
     
-    
-    def extract_features(self,x_4_features, sess):
-        op = self.model["softmax"]
 
 
     
