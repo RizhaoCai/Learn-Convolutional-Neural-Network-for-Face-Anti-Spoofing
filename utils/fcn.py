@@ -1,4 +1,4 @@
-# Depthmap
+# This is a fully connected network for FACE SPOOFING, which predict the depth maps of of spoofing faces. 
 import tensorflow as tf
 import numpy as np
 
